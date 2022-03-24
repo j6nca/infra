@@ -1,33 +1,9 @@
-resource "aws_instance" "foo" {
-  ami           = var.ami # us-west-2
-  instance_type = var.instance_type
-  key_name      = var.key_pair
-
-  security_groups = [aws_security_group.jenkins_sg.name]
-
-  user_data = file("${path.module}/scripts/setup.sh")
-}
-
-resource "aws_security_group" "jenkins_sg" {
-  name        = "jenkins_sg"
-
-  vpc_id = data.aws_vpc.default_vpc.id
-  ingress{
-    from_port = 8080
-    protocol = "TCP"
-    to_port = 8080
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress{
-    from_port = 22
-    protocol = "TCP"
-    to_port = 22
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress{
-    from_port = 0
-    protocol = "-1"
-    to_port = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+module "jenkins"{
+    source = "../../../../tf-modules/instances/jenkins"
+    instance_type = "t3.micro"
+    # Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
+    ami = "ami-0c02fb55956c7d316"
+    key_pair = "jenkins"
+    hosted_zone_id = "Z0889591OHZG9Q5EXENE"
+    vpc_id = data.aws_vpc.default_vpc.id
 }
